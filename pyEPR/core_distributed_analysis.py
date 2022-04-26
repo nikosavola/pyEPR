@@ -870,7 +870,7 @@ class DistributedAnalysis(object):
 
     def get_Qdielectric(self, dielectric, mode, variation, U_E=None):
         if U_E is None:
-            U_E = self.calc_energy_electric(variation) 
+            U_E = self.calc_energy_electric(variation)
         Qdielectric = OrderedDict()
         print('Calculating Qdielectric_' + dielectric + ' for mode ' +
               str(mode) + ' (' + str(mode) + '/' + str(self.n_modes-1) + ')')
@@ -1077,10 +1077,9 @@ class DistributedAnalysis(object):
         # Rerun previously analyze variations from load filename
         return self._previously_analyzed
 
-    def get_junctions_L_and_C(self, variation: str):
+    def get_junctions_L_and_C(self, variation: str = 'all'):
         """
-        Returns a pandas Series with the index being the junction name as specified in the
-        project_info.
+        Returns a pandas Series with the index being the junction name as specified in the project_info or a DataFrame of all variations.
 
         The values in the series are numeric and in SI base units, i.e., not nH but Henries,
         and not fF but Farads.
@@ -1091,18 +1090,22 @@ class DistributedAnalysis(object):
         """
         if variation == 'all':
             # for all variations and concat
-            raise NotImplementedError()  # TODO
+            L_and_C = pd.concat([item for sublist in
+                (self.get_junctions_L_and_C(v) for v in self.variations)
+                for item in sublist], axis=0)
+            return L_and_C
+
         else:
             Ljs = pd.Series({})
             Cjs = pd.Series({})
 
             for junc_name, val in self.pinfo.junctions.items():  # junction nickname
                 _variables = self._hfss_variables[variation]
-                def _parse(name): return ureg.Quantity(
-                    _variables['_'+val[name]]).to_base_units().magnitude
+                def _parse(name):
+                    return ureg.Quantity(_variables['_'+val[name]]) \
+                        .to_base_units().magnitude
                 Ljs[junc_name] = _parse('Lj_variable')
-                Cjs[junc_name] = 2E-15  # _parse(
-                # 'Cj_variable') if 'Cj_variable' in val else 0
+                Cjs[junc_name] = _parse('Cj_variable') if 'Cj_variable' in val else 0
 
         return Ljs, Cjs
 
@@ -1154,7 +1157,7 @@ class DistributedAnalysis(object):
             eprd = epr.DistributedAnalysis(pinfo)
             eprd.do_EPR_analysis(append_analysis=False)
         """
-        
+
         if not modes is None:
             assert max(modes) < self.n_modes, 'Non-existing mode selected. \n'\
                 f'The possible modes are between 0 and {self.n_modes-1}.'
