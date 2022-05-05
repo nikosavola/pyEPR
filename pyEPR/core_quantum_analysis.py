@@ -567,11 +567,12 @@ class QuantumAnalysis(object):
             :SJ: Sign matrix, s_mj
             :Om: Omega_mm matrix (in GHz) (\hbar = 1) Not radians.
             :EJ: E_jj matrix of Josephson energies (in same units as hbar omega matrix)
-            :PHI_zpf: ZPFs in units of \phi_0 reduced flux quantum
+            :PHI_zpf: ZPFs in units of :math:`\phi_0` reduced flux quantum
             :PJ_cap: capacitive participation matrix
+            :n_zpf: ZPFs in units of reduced charge
 
             Return all as *np.array*
-                PM, SIGN, Om, EJ, Phi_ZPF
+                PM, SIGN, Om, EJ, Phi_ZPF, PJ_cap, n_zpf
         '''
         # TODO: supersede by Convert.ZPF_from_EPR
 
@@ -652,7 +653,7 @@ class QuantumAnalysis(object):
             print('%s, ' % variation, end='')
 
         # Get matrices
-        PJ, SJ, Om, EJ, PHI_zpf, PJ_cap, n_zpf = self.get_epr_base_matrices(
+        PJ, SJ, Om, EJ, PHI_zpf, PJ_cap, _ = self.get_epr_base_matrices(
             variation)
         freqs_hfss = self.freqs_hfss[variation].values[(modes)]
         Ljs = self.Ljs[variation].values

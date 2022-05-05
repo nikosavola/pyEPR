@@ -6,7 +6,7 @@ import numpy as np
 from numpy import sqrt
 from .. import logger
 
-class CalcsBasic():
+class CalcsBasic:
 
     @staticmethod
     def epr_to_zpf(Pmj, SJ, Ω, EJ):
@@ -17,8 +17,8 @@ class CalcsBasic():
             :Ω: MxM diagonal matrix of frequencies (GHz, not radians, diagonal)
             :EJ: JxJ diagonal matrix matrix of Josephson energies (in same units as Om)
 
-        RETURNS:
-            reduced zpf  (in units of :math:`\phi_0`)
+        Returns:
+            reduced zpf (in units of :math:`\phi_0`)
         '''
         (Pmj, SJ, Ω, EJ) = map(np.array, (Pmj, SJ, Ω, EJ))
 
@@ -44,5 +44,5 @@ class CalcsBasic():
         """
         Experimental. To be tested
         """
-        (Pmj, SJ, Ω, EJ) = map(np.array, (Pmj_cap, SJ, Ω, Ec))
+        (Pmj, SJ, Ω, _) = map(np.array, (Pmj_cap, SJ, Ω, Ec))
         return SJ * sqrt(Ω @ Pmj @ np.linalg.inv(Ec) /(4*4))
